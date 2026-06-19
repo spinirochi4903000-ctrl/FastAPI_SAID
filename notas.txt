@@ -1,0 +1,9 @@
+Recuerda siempre que al modificar o ejecutar el codigo, siempre activar el entorno virtual: venv\Scripts\activate.bat
+(Asi se tendran las dependencias sin necesidad de instalarlas)
+
+Comando para abrir la App:
+uvicorn main:app --reload
+
+Para ver la FastAPI:
+localhost:8000/docs
+
