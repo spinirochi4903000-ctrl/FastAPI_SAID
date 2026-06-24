@@ -12,8 +12,22 @@ class UserConnection:
 
     def write(self, data):
         with self.conn.cursor() as cur:
-            cur.execute("""INSERT INTO "usuarios" (id_usuario, id_rol, nombre_usuario, apellido_usuario, correo_usuario, contrasena_hash, fecha_registro, estado) VALUES (%(id)s, %(role_id)s, %(first_name)s, %(last_name)s, %(email)s, %(password_hash)s, %(registration_date)s, %(status)s)""", data)
-
+            cur.execute("""
+        INSERT INTO "usuarios" (
+            id_rol, 
+            nombre_usuario, 
+            apellido_usuario, 
+            correo_usuario, 
+            contrasena_hash
+        ) 
+        VALUES (
+            %(id_rol)s, 
+            %(nombre_usuario)s, 
+            %(apellido_usuario)s, 
+            %(correo_usuario)s, 
+            %(contrasena_hash)s
+        )
+    """, data)
             self.conn.commit()
 
     def __def__(self):

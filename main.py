@@ -13,4 +13,7 @@ def read_root():
 
 @app.post("/api/insert")
 def insert(user_data: UserSchema):
-    print(user_data)
+    data = user_data.model_dump()
+    conn.write(data) 
+
+  

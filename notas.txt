@@ -4,6 +4,11 @@ Recuerda siempre que al modificar o ejecutar el codigo, siempre activar el entor
 Comando para abrir la App:
 uvicorn main:app --reload
 
+Para cerrar la app:
+(En consola presionar: Ctrl+C)
+
 Para ver la FastAPI:
 localhost:8000/docs
 
+Comando para ejecutar pgsql en la cmd:
+psql -U postgres
