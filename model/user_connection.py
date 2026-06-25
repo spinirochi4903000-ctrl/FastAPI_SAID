@@ -10,6 +10,20 @@ class UserConnection:
             print(err)
             self.conn.close()
 
+    def read_all(self):
+        with self.conn.cursor() as cur:
+            data = cur.execute("""
+            SELECT * FROM usuarios
+            """)
+            return data.fetchall()
+
+    def read_one(self, id_usuario: int):
+        with self.conn.cursor() as cur:
+            data = cur.execute("""
+                SELECT * FROM usuarios WHERE id_usuario = %s
+            """, (id_usuario,))
+            return data.fetchone()
+
     def write(self, data):
         with self.conn.cursor() as cur:
             cur.execute("""
