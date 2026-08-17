@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAID · Panel de usuarios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#0001F0;
+    --yellow:#FFF251;
+    --red:#FF0000;
+    --white:#FFFFFF;
+    --gray:#D9D9D9;
+    --pale:#E4ECF4;
+    --black:#000000;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--white);
+    color:var(--black);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:'Space Grotesk',sans-serif;}
+  code,.mono{font-family:'JetBrains Mono',monospace;}
+
+  header.nav{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:20px clamp(20px,5vw,64px);
+    border-bottom:1px solid var(--gray);
+    position:sticky;top:0;background:rgba(255,255,255,.92);backdrop-filter:blur(6px);z-index:10;
+  }
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;letter-spacing:-0.02em;}
+  .brand .mark{width:30px;height:30px;border-radius:8px;background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;}
+  .nav-right{display:flex;align-items:center;gap:14px;font-size:13px;color:#4a4a4a;}
+  #status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;background:var(--gray);}
+  #status-dot.up{background:var(--blue);animation:pulse 2s infinite;}
+  #status-dot.down{background:var(--red);}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,1,240,.35);}50%{box-shadow:0 0 0 5px rgba(0,1,240,0);}}
+  .badge{font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--pale);border:1px solid var(--gray);padding:3px 8px;border-radius:6px;}
+
+  .hero{padding:clamp(40px,7vw,72px) clamp(20px,5vw,64px) 40px;max-width:920px;}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--blue);text-transform:uppercase;letter-spacing:.12em;margin-bottom:12px;}
+  .hero h1{font-size:clamp(28px,4.6vw,42px);line-height:1.1;margin:0 0 14px;letter-spacing:-0.03em;}
+  .hero h1 span{color:var(--blue);}
+  .hero p{font-size:16px;line-height:1.6;color:#333;max-width:620px;margin:0;}
+
+  main{padding:0 clamp(20px,5vw,64px) 80px;max-width:1080px;display:grid;gap:22px;grid-template-columns:1fr;}
+  @media(min-width:880px){main{grid-template-columns:380px 1fr;align-items:start;}}
+
+  .panel{border:1px solid var(--gray);border-radius:var(--radius);background:var(--white);overflow:hidden;}
+  .panel-head{padding:16px 20px;border-bottom:1px solid var(--gray);display:flex;align-items:center;gap:10px;background:var(--pale);}
+  .panel-head .dot{width:9px;height:9px;border-radius:50%;background:var(--blue);}
+  .panel-head h2{font-size:15px;margin:0;}
+  .panel-body{padding:20px;}
+
+  label{display:block;font-size:12.5px;font-weight:600;margin:0 0 6px;color:#222;}
+  .field{margin-bottom:14px;}
+  .field small{display:block;color:#777;font-size:11.5px;margin-top:4px;}
+  input[type=text],input[type=email],input[type=password],input[type=number]{
+    width:100%;padding:10px 12px;border:1px solid var(--gray);border-radius:7px;
+    font-family:'Inter',sans-serif;font-size:14px;background:#fff;color:#000;
+    transition:border-color .15s ease;
+  }
+  input:focus{outline:none;border-color:var(--blue);}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .checkbox-row{display:flex;align-items:center;gap:8px;margin-bottom:16px;}
+  .checkbox-row input{width:16px;height:16px;}
+  .checkbox-row label{margin:0;font-weight:500;}
+
+  .btn{font-family:'Inter',sans-serif;font-weight:600;font-size:14px;padding:11px 18px;border-radius:8px;border:1px solid transparent;cursor:pointer;display:inline-flex;align-items:center;gap:8px;width:100%;justify-content:center;}
+  .btn-primary{background:var(--blue);color:#fff;}
+  .btn-primary:hover{background:#0001c9;}
+  .btn-primary:disabled{opacity:.55;cursor:default;}
+  .btn-ghost{background:#fff;color:#000;border-color:var(--gray);}
+  .btn-ghost:hover{border-color:#000;}
+
+  .msg{margin-top:12px;padding:10px 12px;border-radius:7px;font-size:13px;line-height:1.5;display:none;}
+  .msg.show{display:block;}
+  .msg.ok{background:var(--pale);border:1px solid var(--blue);color:#00019a;}
+  .msg.err{background:#ffecec;border:1px solid var(--red);color:#a10000;}
+  .msg ul{margin:6px 0 0;padding-left:18px;}
+
+  .search-row{display:flex;gap:10px;}
+  .search-row input{flex:1;}
+  .search-row button{width:auto;padding:10px 16px;}
+
+  .user-card{border:1px solid var(--gray);border-radius:8px;padding:14px 16px;margin-top:14px;background:var(--pale);font-size:13.5px;}
+  .user-card .kv{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;}
+  .user-card .k{font-family:'JetBrains Mono',monospace;font-weight:600;color:#000;}
+  .user-card .v{color:#222;word-break:break-word;}
+  .pill{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;padding:2px 8px;border-radius:5px;background:var(--blue);color:#fff;}
+  .pill.inactive{background:var(--gray);color:#333;}
+
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  thead th{text-align:left;font-family:'JetBrains Mono',monospace;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#555;border-bottom:1px solid var(--gray);padding:8px 10px;}
+  tbody td{padding:9px 10px;border-bottom:1px solid #eee;}
+  tbody tr:hover{background:var(--pale);}
+  .empty-row td{color:#888;text-align:center;padding:24px 10px;}
+
+  footer{border-top:1px solid var(--gray);padding:22px clamp(20px,5vw,64px) 36px;font-size:12px;color:#666;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="brand"><span class="mark">S</span>SAID · Panel de usuarios</div>
+  <div class="nav-right">
+    <span><span id="status-dot"></span><span id="status-text">Verificando conexión…</span></span>
+    <span class="badge mono" id="base-url-badge">localhost:8000</span>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="eyebrow">Frontend conectado a FastAPI</div>
+  <h1>Registra y consulta <span>usuarios</span> en tiempo real.</h1>
+  <p>Este panel habla directamente con tu backend en Python: envía datos con <code>POST /api/insert</code> y los consulta con <code>GET /api/usuarios/{id}</code> y <code>GET /</code>.</p>
+</section>
+
+<main>
+  <div class="panel">
+    <div class="panel-head"><span class="dot"></span><h2>Registrar usuario</h2></div>
+    <div class="panel-body">
+      <form id="form-insert">
+        <div class="row2">
+          <div class="field">
+            <label for="nombre_usuario">Nombre</label>
+            <input type="text" id="nombre_usuario" required>
+          </div>
+          <div class="field">
+            <label for="apellido_usuario">Apellido</label>
+            <input type="text" id="apellido_usuario" required>
+          </div>
+        </div>
+        <div class="field">
+          <label for="correo_usuario">Correo</label>
+          <input type="email" id="correo_usuario" required>
+        </div>
+        <div class="field">
+          <label for="contrasena_hash">Contraseña</label>
+          <input type="password" id="contrasena_hash" required>
+          <small>Se envía tal cual al backend — el hash debe generarse en el servidor, no aquí.</small>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="id_rol">Rol (id_rol)</label>
+            <input type="number" id="id_rol" placeholder="opcional">
+          </div>
+          <div class="checkbox-row" style="align-self:end;padding-bottom:14px;">
+            <input type="checkbox" id="estado" checked>
+            <label for="estado">Usuario activo</label>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" id="btn-insert">Registrar usuario</button>
+        <div class="msg" id="msg-insert"></div>
+      </form>
+    </div>
+  </div>
+
+  <div style="display:grid;gap:22px;">
+    <div class="panel">
+      <div class="panel-head"><span class="dot"></span><h2>Consultar usuario por ID</h2></div>
+      <div class="panel-body">
+        <div class="search-row">
+          <input type="number" id="search_id" placeholder="id_usuario, ej: 1">
+          <button class="btn btn-primary" id="btn-search" style="width:auto;">Buscar</button>
+        </div>
+        <div class="msg" id="msg-search"></div>
+        <div id="search-result"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head" style="justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:10px;"><span class="dot"></span><h2>Todos los usuarios</h2></div>
+        <button class="btn btn-ghost" id="btn-refresh" style="width:auto;padding:6px 12px;font-size:12px;">Actualizar</button>
+      </div>
+      <div class="panel-body" style="padding:0;">
+        <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Nombre</th><th>Correo</th><th>Rol</th><th>Estado</th></tr>
+          </thead>
+          <tbody id="users-table-body">
+            <tr class="empty-row"><td colspan="5">Cargando…</td></tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <span>SAID — Sistema de Aprendizaje Interactivo Digital</span>
+  <span>Backend FastAPI · edita <code>BASE_URL</code> en el script si cambia el host</span>
+</footer>
+
+<script>
+const BASE_URL = "http://localhost:8000"; // cambia esto si tu backend corre en otro host/puerto
+document.getElementById('base-url-badge').textContent = BASE_URL.replace('http://','').replace('https://','');
+
+function showMsg(el, type, html){
+  el.className = 'msg show ' + type;
+  el.innerHTML = html;
+}
+function hideMsg(el){
+  el.className = 'msg';
+  el.innerHTML = '';
+}
+
+async function parseError(res){
+  try{
+    const body = await res.json();
+    if(body.detail && Array.isArray(body.detail)){
+      const items = body.detail.map(d => `<li><code>${(d.loc||[]).join(' → ')}</code>: ${d.msg}</li>`).join('');
+      return `<strong>No se pudo completar (422).</strong><ul>${items}</ul>`;
+    }
+    if(body.detail) return `<strong>Error:</strong> ${body.detail}`;
+    return `<strong>Error ${res.status}.</strong>`;
+  }catch(e){
+    return `<strong>Error ${res.status}.</strong> No se pudo leer la respuesta del servidor.`;
+  }
+}
+
+function userCardHTML(u){
+  const activo = u.estado === true || u.estado === 1;
+  return `
+    <div class="user-card">
+      <div class="kv">
+        <span class="k">id_usuario</span><span class="v">${u.id_usuario ?? '—'}</span>
+        <span class="k">nombre</span><span class="v">${u.nombre_usuario ?? ''} ${u.apellido_usuario ?? ''}</span>
+        <span class="k">correo</span><span class="v">${u.correo_usuario ?? '—'}</span>
+        <span class="k">id_rol</span><span class="v">${u.id_rol ?? '—'}</span>
+        <span class="k">registro</span><span class="v">${u.fecha_registro ?? '—'}</span>
+        <span class="k">estado</span><span class="v"><span class="pill ${activo?'':'inactive'}">${activo?'activo':'inactivo'}</span></span>
+      </div>
+    </div>`;
+}
+
+async function checkStatus(){
+  const dot = document.getElementById('status-dot');
+  const text = document.getElementById('status-text');
+  try{
+    const res = await fetch(`${BASE_URL}/`);
+    if(res.ok){
+      dot.className = 'up';
+      text.textContent = 'Backend conectado';
+    } else {
+      dot.className = 'down';
+      text.textContent = `Backend respondió ${res.status}`;
+    }
+  }catch(e){
+    dot.className = 'down';
+    text.textContent = 'Sin conexión al backend';
+  }
+}
+
+document.getElementById('form-insert').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('btn-insert');
+  const msg = document.getElementById('msg-insert');
+  hideMsg(msg);
+
+  const idRolVal = document.getElementById('id_rol').value;
+  const payload = {
+    nombre_usuario: document.getElementById('nombre_usuario').value.trim(),
+    apellido_usuario: document.getElementById('apellido_usuario').value.trim(),
+    correo_usuario: document.getElementById('correo_usuario').value.trim(),
+    contrasena_hash: document.getElementById('contrasena_hash').value,
+    id_rol: idRolVal === '' ? null : Number(idRolVal),
+    estado: document.getElementById('estado').checked
+  };
+
+  btn.disabled = true;
+  btn.textContent = 'Registrando…';
+  try{
+    const res = await fetch(`${BASE_URL}/api/insert`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    if(res.ok){
+      showMsg(msg, 'ok', 'Usuario registrado correctamente.');
+      e.target.reset();
+      document.getElementById('estado').checked = true;
+      loadAllUsers();
+    } else {
+      showMsg(msg, 'err', await parseError(res));
+    }
+  }catch(err){
+    showMsg(msg, 'err', `<strong>No se pudo conectar con el backend.</strong> Verifica que esté corriendo en <code>${BASE_URL}</code> y que tenga CORS habilitado.`);
+  }finally{
+    btn.disabled = false;
+    btn.textContent = 'Registrar usuario';
+  }
+});
+
+document.getElementById('btn-search').addEventListener('click', async () => {
+  const msg = document.getElementById('msg-search');
+  const resultBox = document.getElementById('search-result');
+  const id = document.getElementById('search_id').value;
+  hideMsg(msg);
+  resultBox.innerHTML = '';
+  if(id === ''){
+    showMsg(msg, 'err', 'Escribe un id_usuario.');
+    return;
+  }
+  try{
+    const res = await fetch(`${BASE_URL}/api/usuarios/${id}`);
+    if(res.ok){
+      const data = await res.json();
+      resultBox.innerHTML = userCardHTML(data);
+    } else {
+      showMsg(msg, 'err', await parseError(res));
+    }
+  }catch(err){
+    showMsg(msg, 'err', `No se pudo conectar con el backend en <code>${BASE_URL}</code>.`);
+  }
+});
+
+async function loadAllUsers(){
+  const tbody = document.getElementById('users-table-body');
+  tbody.innerHTML = `<tr class="empty-row"><td colspan="5">Cargando…</td></tr>`;
+  try{
+    const res = await fetch(`${BASE_URL}/`);
+    if(!res.ok){
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="5">No se pudo cargar (código ${res.status}).</td></tr>`;
+      return;
+    }
+    const data = await res.json();
+    if(!Array.isArray(data) || data.length === 0){
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="5">Todavía no hay usuarios registrados.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = data.map(u => {
+      const activo = u.estado === true || u.estado === 1;
+      return `<tr>
+        <td class="mono">${u.id_usuario ?? '—'}</td>
+        <td>${u.nombre_usuario ?? ''} ${u.apellido_usuario ?? ''}</td>
+        <td>${u.correo_usuario ?? '—'}</td>
+        <td class="mono">${u.id_rol ?? '—'}</td>
+        <td><span class="pill ${activo?'':'inactive'}">${activo?'activo':'inactivo'}</span></td>
+      </tr>`;
+    }).join('');
+  }catch(err){
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="5">Sin conexión al backend.</td></tr>`;
+  }
+}
+
+document.getElementById('btn-refresh').addEventListener('click', loadAllUsers);
+
+checkStatus();
+loadAllUsers();
+</script>
+
+</body>
+</html>
